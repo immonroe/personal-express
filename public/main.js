@@ -1,79 +1,49 @@
-var thumbUp = document.getElementsByClassName("fa-thumbs-up");
-var thumbDown = document.getElementsByClassName("fa-thumbs-down");
-var trash = document.getElementsByClassName("fa-trash");
-
-Array.from(thumbUp).forEach(function(element) {
-      element.addEventListener('click', function(){
-        const name = this.parentNode.parentNode.childNodes[1].innerText
-        const msg = this.parentNode.parentNode.childNodes[3].innerText
-        const thumbUp = parseFloat(this.parentNode.parentNode.childNodes[5].innerText) // is there a more efficient solution that directly targets this element?
-        console.log(thumbUp)
-        // Changed fetch route to match app.put on server.js file
-        fetch('messages/upvote', {
-          method: 'put',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            'name': name,
-            'msg': msg,
-            'thumbUp':thumbUp,
-          })
-        })
-        .then(response => {
-          if (response.ok) return response.json()
-        })
-        .then(data => {
-          console.log(data)
-          window.location.reload(true)
-        })
-      });
-});
-
-// refactor to thumbDown - copy/paste from thumbUp Array.from() method above + minor tweaks
-Array.from(thumbDown).forEach(function(element) {
-  element.addEventListener('click', function(){
-    const name = this.parentNode.parentNode.childNodes[1].innerText
-    const msg = this.parentNode.parentNode.childNodes[3].innerText
-    const thumbUp = parseFloat(this.parentNode.parentNode.childNodes[5].innerText)
-    const thumbDown = parseFloat(this.parentNode.parentNode.childNodes[7].innerText) // is there a more efficient solution that directly targets this element?
-    console.log(thumbUp)
-    console.log(thumbDown)
-
-    // Changed fetch route to match app.put on server.js file
-    fetch('messages/downvote', {
-      method: 'put',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        'name': name,
-        'msg': msg,
-        'thumbUp':thumbUp,
-        'thumbDown':thumbDown
-      })
-    })
-    .then(response => {
-      if (response.ok) return response.json()
-    })
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/current-cat')
+    .then(res => res.json())
     .then(data => {
-      console.log(data)
-      window.location.reload(true)
+      if (data && data.catImageUrl) {
+        showCatImage(data.catImageUrl);
+      }
     })
-  });
+    .catch(error => console.error('Error loading current cat image:', error));
+
+  document.getElementById('generateCat').addEventListener('click', fetchCatImage);
 });
 
-Array.from(trash).forEach(function(element) {
-      element.addEventListener('click', function(){
-        const name = this.parentNode.parentNode.childNodes[1].innerText
-        const msg = this.parentNode.parentNode.childNodes[3].innerText
-        fetch('messages', {
-          method: 'delete',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            'name': name,
-            'msg': msg
-          })
-        }).then(function (response) {
-          window.location.reload()
-        })
-      });
-});
+function fetchCatImage() {
+  fetch('https://api.thecatapi.com/v1/images/search')
+    .then(res => res.json())
+    .then(data => {
+      const catImageUrl = data[0].url;
+      showCatImage(catImageUrl);
+
+      // Save it server-side
+      fetch('/current-cat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ catImageUrl })
+      }).catch(error => console.error('Error updating cat image:', error));
+    })
+    .catch(error => console.error('Error fetching cat image:', error));
+}
+
+// ran into bug where cat would sometimes not show on page load and entire app would crash lol
+function showCatImage(url) {
+  const container = document.querySelector('.cat-container');
+  let img = document.getElementById('catImage');
+  const msg = document.getElementById('message');
+
+  if (!img) {
+    img = document.createElement('img');
+    img.id = 'catImage';
+    img.alt = 'Cat image';
+    container.appendChild(img);
+  }
+
+  img.src = url;
+
+  if (msg) msg.style.display = 'none';
+}

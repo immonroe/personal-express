@@ -2,38 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>21 Savage Fans</title>
+  <title>Purr-fection</title>
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="stylesheet" href="font-awesome.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>21 Savage</h1>
-  <h2>Why you trappin so hard?</h2>
+  <h1>Purr-fection - A Cat Lover's Paradise</h1>
+  <h2>Let's all share the joy of cats - using fullstack technology so everyone is always seeing the same thing!</h2>
 
+  <h3>Meow</h3>
+  <div class="cat-container">
+    <% if (catImageUrl) { %>
+      <img src="<%= catImageUrl %>" alt="Cat image" id="catImage" />
+    <% } else { %>
+      <p id="message">No cat image yet! Hit the button to generate one.</p>
+    <% } %>
+  </div>
 
-  <h3>Messages</h3>
-  <ul class="messages">
-  <% for(var i=0; i<messages.length; i++) {%>
-    <li class="message">
-      <span><%= messages[i].name %></span>
-      <span><%= messages[i].msg %></span>
-      <span><%= messages[i].thumbUp %></span>
-      <span><i class="fa fa-thumbs-up" aria-hidden="true"></i></span>
-      <!-- <span><%= messages[i].thumbDown %></span> -->
-      <span><i class="fa fa-thumbs-down" aria-hidden="true"></i></span>
-      <span><i class="fa fa-trash" aria-hidden="true"></i></span>
-    </li>
-  <% } %>
-  </ul>
-
-  <h2>Add a message</h2>
-
-  <form action="/messages" method="POST">
-    <input type="text" placeholder="name" name="name">
-    <input type="text" placeholder="message" name="msg">
-    <button type="submit">Submit</button>
-  </form>
+  <div class="buttons">
+    <button id="generateCat">
+      <i class="fa fa-refresh"></i> Generate New Cat
+    </button>
+  </div>
 
   <script src="main.js"></script>
 
